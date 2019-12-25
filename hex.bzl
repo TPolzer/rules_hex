@@ -1,4 +1,5 @@
-#Credit to https://github.com/schmist/
+# Credit to https://github.com/schmist/
+# and https://github.com/jemdiggity/rules_hex.
 
 def _impl(ctx):
     output = ctx.outputs.out
@@ -6,17 +7,24 @@ def _impl(ctx):
     objcopy = ctx.fragments.cpp.objcopy_executable
 
     ctx.action(
-        inputs=[input],
-        outputs=[output],
-        progress_message="Creating HEX binary from %s" % input.short_path,
-        command="%s -O ihex %s %s" % (objcopy, input.path, output.path))
+        inputs = [input],
+        outputs = [output],
+        progress_message = "Creating HEX binary from %s" % input.short_path,
+        command = "%s -O ihex %s %s" % (objcopy, input.path, output.path),
+    )
 
 hex = rule(
-    implementation=_impl,
-    fragments=["cpp"],
-    attrs={
-        "src": attr.label(mandatory=True, allow_files=True, single_file=True),
-        "show_size": attr.bool(mandatory=False, default=False),
+    attrs = {
+        "src": attr.label(
+            mandatory = True,
+            allow_single_file = True,
+        ),
+        "show_size": attr.bool(
+            mandatory = False,
+            default = False,
+        ),
     },
-    outputs={"out": "%{src}.hex"},
+    fragments = ["cpp"],
+    outputs = {"out": "%{src}.hex"},
+    implementation = _impl,
 )
